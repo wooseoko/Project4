@@ -32,7 +32,7 @@ double world_y_max;
 
 //parameters we should adjust : K, margin, MaxStep
 int margin = 5;
-int K = 500;
+int K = 2000;
 double MaxStep = 2;
 int waypoint_margin = 24;
 
@@ -218,7 +218,44 @@ void set_waypoints()
     }
 
     //TODO 2
-
+	//4th quadrant
+	    while(true)
+	    {
+    	    int rand_i = ((1+iSize)/2) + std::rand() % (iSize/2);
+	        int rand_j = ((1+jSize)/2) + std::rand() % (jSize/2);
+	        if(map_margin.at<uchar>(rand_i,rand_j)>125)
+	        {
+	          waypoint_candid[1].x = res*(rand_i-map_origin_x);
+	          waypoint_candid[1].y = res*(rand_j-map_origin_y);
+	          break;
+	        }
+	    }
+	
+	    //3th quadrant
+	    while(true)
+	    {
+	        int rand_i = ((1+iSize)/2) + std::rand() % (iSize/2);
+	        int rand_j = std::rand() % (jSize/2);
+	        if(map_margin.at<uchar>(rand_i,rand_j)>125)
+	        {
+	          waypoint_candid[2].x = res*(rand_i-map_origin_x);
+	          waypoint_candid[2].y = res*(rand_j-map_origin_y);
+	          break;
+	        }
+	    }
+	
+	    //2th quadrant
+	    while(true)
+	    {
+	        int rand_i = std::rand() % (iSize/2);
+	        int rand_j = std::rand() % (jSize/2);
+	        if(map_margin.at<uchar>(rand_i,rand_j)>125)
+	        {
+	          waypoint_candid[3].x = res*(rand_i-map_origin_x);
+	          waypoint_candid[3].y = res*(rand_j-map_origin_y);
+	          break;
+	        }
+	}
 
     waypoint_candid[4].x = -3.5;
     waypoint_candid[4].y = 12.0;

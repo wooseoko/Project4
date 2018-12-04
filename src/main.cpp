@@ -31,7 +31,7 @@ double world_y_min;
 double world_y_max;
 
 //parameters we should adjust : K, margin, MaxStep
-int margin = 1;
+int margin = 3;
 int K = 2000;
 double MaxStep = 2;
 int waypoint_margin = 24;
@@ -148,11 +148,11 @@ int main(int argc, char** argv){
 //              printf("path_RRT[i].x , y %.2f  %.2f \n ", path_RRT[i].x,path_RRT[i].y);
                 setcmdvel(speed,steering);
                 cmd_vel_pub.publish(cmd);
-                if(pow(path_RRT[i].x-robot_pose.x,2)+pow(path_RRT[i].y-robot_pose.y,2)<pow(0.23,2)) {
+                if(pow(path_RRT[i].x-robot_pose.x,2)+pow(path_RRT[i].y-robot_pose.y,2)<pow(0.3,2)) {
                     i++;
                 }
 //              printf("look_ahead_idx %d\n",look_ahead_idx); 
-                if(pow(waypoints[look_ahead_idx].x-robot_pose.x,2)+pow(waypoints[look_ahead_idx].y-robot_pose.y,2)<pow(0.3,2)) look_ahead_idx++;
+                if(pow(waypoints[look_ahead_idx].x-robot_pose.x,2)+pow(waypoints[look_ahead_idx].y-robot_pose.y,2)<pow(0.45,2)) look_ahead_idx++;
                 if(look_ahead_idx==waypoints.size())
                 {
                     state=FINISH;

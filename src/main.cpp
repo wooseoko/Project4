@@ -31,7 +31,7 @@ double world_y_min;
 double world_y_max;
 
 //parameters we should adjust : K, margin, MaxStep
-int margin = 3;
+int margin = 5;
 int K = 2000;
 double MaxStep = 2;
 int waypoint_margin = 24;
@@ -75,7 +75,7 @@ int main(int argc, char** argv){
     // FSM
     state = INIT;
     bool running = true;
-	int look_ahead_idx;
+	int look_ahead_idx=0;
     ros::Rate control_rate(60);
 
     while(running){
@@ -129,8 +129,9 @@ int main(int argc, char** argv){
                 //TODO 1
                 while(ros::ok()){
 //          printf("Running PID \n");
+
 /*              printf("start while & i : %d\n",i);
-//              printf("look_ahead_idx %d",look_ahead_idx);
+              printf("look_ahead_idx %d",look_ahead_idx);
 //              printf(" path x , y , th %2f, %2f, %2f \n", path_RRT[i].x,path_RRT[i].y,path_RRT[i].th);*/
 //              printf("robot pose x, y, th %2f, %2f, %2f\n",robot_pose.x,robot_pose.y,robot_pose.th);
                 point path_now;
@@ -148,11 +149,11 @@ int main(int argc, char** argv){
 //              printf("path_RRT[i].x , y %.2f  %.2f \n ", path_RRT[i].x,path_RRT[i].y);
                 setcmdvel(speed,steering);
                 cmd_vel_pub.publish(cmd);
-                if(pow(path_RRT[i].x-robot_pose.x,2)+pow(path_RRT[i].y-robot_pose.y,2)<pow(0.3,2)) {
+                if(pow(path_RRT[i].x-robot_pose.x,2)+pow(path_RRT[i].y-robot_pose.y,2)<pow(0.58,2)) {
                     i++;
                 }
-//              printf("look_ahead_idx %d\n",look_ahead_idx); 
-                if(pow(waypoints[look_ahead_idx].x-robot_pose.x,2)+pow(waypoints[look_ahead_idx].y-robot_pose.y,2)<pow(0.45,2)) look_ahead_idx++;
+              printf("look_ahead_idx %d\n",look_ahead_idx); 
+                if(pow(waypoints[look_ahead_idx].x-robot_pose.x,2)+pow(waypoints[look_ahead_idx].y-robot_pose.y,2)<pow(0.7,2)) look_ahead_idx++;
                 if(look_ahead_idx==waypoints.size())
                 {
                     state=FINISH;
@@ -285,7 +286,7 @@ void generate_path_RRT()
             rrtTree *tree = new rrtTree(lastp, waypoints[i+1], map, map_origin_x, map_origin_y, res, margin);
             tree->generateRRT(world_x_max, world_x_min, world_y_max, world_y_min, K, MaxStep);
             std::vector<traj> vec = tree->backtracking_traj();
-			if( (vec.begin()->x-waypoints[i+1].x)*(vec.begin()->x-waypoints[i+1].x)+(vec.begin()->y-waypoints[i+1].y)*(vec.begin()->y-waypoints[i+1].y) > 0.04 && i>0 ){
+			if( (vec.begin()->x-waypoints[i+1].x)*(vec.begin()->x-waypoints[i+1].x)+(vec.begin()->y-waypoints[i+1].y)*(vec.begin()->y-waypoints[i+1].y) > 0.05 && i>0 ){
    			    printf("!!!REFIND THE WAY\n");
 			    printf(" x y %.2f %.2f waypoints %.2f %.2f\n", vec.begin()->x, vec.begin()->y,waypoints[i+1].x, waypoints[i+1].y);
 			    if(i>0){ 

@@ -43,7 +43,7 @@ std::vector<point> waypoints;
 std::vector<traj> path_RRT;
 
 //entering theta
-std::vector<double> entering_theta;
+std::vector<point> entering;
 
 //path length 
 std::vector<int> path_length;
@@ -153,7 +153,7 @@ int main(int argc, char** argv){
                     i++;
                 }
               printf("look_ahead_idx %d\n",look_ahead_idx); 
-                if(pow(waypoints[look_ahead_idx].x-robot_pose.x,2)+pow(waypoints[look_ahead_idx].y-robot_pose.y,2)<pow(0.7,2)) look_ahead_idx++;
+                if(pow(waypoints[look_ahead_idx].x-robot_pose.x,2)+pow(waypoints[look_ahead_idx].y-robot_pose.y,2)<pow(0.8,2)) look_ahead_idx++;
                 if(look_ahead_idx==waypoints.size())
                 {
                     state=FINISH;
@@ -272,26 +272,36 @@ void set_waypoints()
 void generate_path_RRT()
 {
     //TODO 1
+	point start;
+	start.x=0.0;
+	start.y=0.0;
+	start.th=0.0;
 		for(int i=0;i<waypoints.size();i++) 
 		{
-		    entering_theta.push_back(0.0);
+		    entering.push_back(start);
 		    path_length.push_back(0);
 		}	
 //      printf("RRT\n");
         point lastp=waypoints[0];
-		entering_theta[0]=waypoints[0].th;
+		entering[0].th=waypoints[0].th;
+		entering[0].x=waypoints[0].x;
+		entering[0].y=waypoints[0].y;
+
         for(int i=0; i<waypoints.size()-1; i++){
-			lastp.x=waypoints[i].x;
-            lastp.y=waypoints[i].y;
+//			lastp.x=waypoints[i].x;
+//            lastp.y=waypoints[i].y;
             rrtTree *tree = new rrtTree(lastp, waypoints[i+1], map, map_origin_x, map_origin_y, res, margin);
             tree->generateRRT(world_x_max, world_x_min, world_y_max, world_y_min, K, MaxStep);
             std::vector<traj> vec = tree->backtracking_traj();
-			if( (vec.begin()->x-waypoints[i+1].x)*(vec.begin()->x-waypoints[i+1].x)+(vec.begin()->y-waypoints[i+1].y)*(vec.begin()->y-waypoints[i+1].y) > 0.05 && i>0 ){
+			if( (vec.begin()->x-waypoints[i+1].x)*(vec.begin()->x-waypoints[i+1].x)+(vec.begin()->y-waypoints[i+1].y)*(vec.begin()->y-waypoints[i+1].y) > 0.04 && i>0 ){
    			    printf("!!!REFIND THE WAY\n");
 			    printf(" x y %.2f %.2f waypoints %.2f %.2f\n", vec.begin()->x, vec.begin()->y,waypoints[i+1].x, waypoints[i+1].y);
 			    if(i>0){ 
 					i=i-2; 
-			 		lastp.th = entering_theta[i+1];
+			 		lastp.th = entering[i+1].th;
+			 		lastp.x = entering[i+1].x;
+			 		lastp.y = entering[i+1].y;
+
  					for(int j=0;j<path_length[i+1];j++) path_RRT.pop_back();
 		    	}
 			}
@@ -300,7 +310,10 @@ void generate_path_RRT()
 		    	lastp.x = vec.begin()->x;
                 lastp.y = vec.begin()->y;
                 lastp.th = vec.begin()->th;
-		    	entering_theta[i+1]= lastp.th;		
+		    	entering[i+1].th= lastp.th;		
+				entering[i+1].x= lastp.x;		
+		    	entering[i+1].y= lastp.y;		
+
                 tree->visualizeTree();
 	    	    std::reverse(vec.begin(),vec.end());
                 tree->visualizeTree(vec);
@@ -310,11 +323,11 @@ void generate_path_RRT()
 			}
             delete tree;
         }
-        traj lastpoint;
+/*        traj lastpoint;
         lastpoint.x=waypoints[waypoints.size()-1].x;
         lastpoint.y=waypoints[waypoints.size()-1].y;
         lastpoint.th=waypoints[waypoints.size()-1].th; 
-        path_RRT.push_back(lastpoint);
+        path_RRT.push_back(lastpoint);*/
 
 
 }
